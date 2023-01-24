@@ -92,6 +92,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   },
   {
+    sequelize,
     modelName:'Contest',
     tableName: 'Contests',
     timestamps: false,
