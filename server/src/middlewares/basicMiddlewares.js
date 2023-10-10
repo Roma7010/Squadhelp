@@ -36,6 +36,7 @@ module.exports.canGetContest = async (req, res, next) => {
         },
       });
     }
+    console.log('result', result);
     result ? next() : next(new RightsError());
   } catch (e) {
     next(new ServerError(e));

@@ -128,15 +128,17 @@ class CreatorDashboard extends React.Component {
 
     setContestList = () => {
       const array = [];
-      const { contests } = this.props;
+      const { contests } = this.props;     
       for (let i = 0; i < contests.length; i++) {
+        if(contests[i].status==="active"){
         array.push(<ContestBox
           data={contests[i]}
           key={contests[i].id}
           goToExtended={this.goToExtended}
         />);
-      }
+        }}
       return array;
+     
     };
 
     goToExtended = (contestId) => {

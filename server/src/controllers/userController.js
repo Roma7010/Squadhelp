@@ -132,7 +132,7 @@ module.exports.payment = async (req, res, next) => {
         req.body.price / req.body.contests.length)
         : Math.floor(req.body.price / req.body.contests.length);
       contest = Object.assign(contest, {
-        status: index === 0 ? 'active' : 'pending',
+        status: /*index === 0 ? */'active' /*:*/ /*'pending'*/,
         userId: req.tokenData.userId,
         priority: index + 1,
         orderId,

@@ -10,7 +10,6 @@ module.exports.dataForContest = async (req, res, next) => {
   const response = {};
   try {
     const { body: { characteristic1, characteristic2 } } = req;
-    console.log(req.body, characteristic1, characteristic2);
     const types = [characteristic1, characteristic2, 'industry'].filter(Boolean);
 
     const characteristics = await db.Select.findAll({
@@ -37,67 +36,136 @@ module.exports.dataForContest = async (req, res, next) => {
 };
 
 module.exports.getContestById = async (req, res, next) => {
+  let findRating;
+  let findoffer = await db.Offer.findOne({
+    where: { contestId: req.headers.contestid } });
+  if(findoffer) findRating = await db.Rating.findOne({
+    where: { offerId: findoffer.id } });
+  else findRating = null;
   try {
-    let contestInfo = await db.Contest.findOne({
-      where: { id: req.headers.contestid },
-      order: [
-        [db.Offer, 'id', 'asc'],
-      ],
-      include: [
-        {
-          model: db.User,
-          required: true,
-          attributes: {
-            exclude: [
-              'password',
-              'role',
-              'balance',
-              'accessToken',
+    if (findoffer !== null && findRating !== null) {
+      let contestInfo = await db.Contest.findOne({
+        where: { id: req.headers.contestid },
+        order: [
+          [db.Offer, 'id', 'asc'],
+        ],
+        include: [
+          {
+            model: db.User,
+            required: true,
+            attributes: {
+              exclude: [
+                'password',
+                'role',
+                'balance',
+                'accessToken',
+              ],
+            },
+          },
+          {
+            model: db.Offer,
+            required: false,
+            where: req.tokenData.role === CONSTANTS.CREATOR
+              ? { userId: req.tokenData.userId }
+              : {},
+            attributes: { exclude: ['userId', 'contestId'] },
+            include: [
+              {
+                model: db.User,
+                required: true,
+                attributes: {
+                  exclude: [
+                    'password',
+                    'role',
+                    'balance',
+                    'accessToken',
+                  ],
+                },
+              },
+              {
+                model: db.Rating,
+                required: false,
+                where: { userId: req.tokenData.userId },
+                attributes: { exclude: ['userId', 'offerId'] },
+              },
             ],
           },
-        },
-        {
-          model: db.Offer,
-          required: false,
-          where: req.tokenData.role === CONSTANTS.CREATOR
-            ? { userId: req.tokenData.userId }
-            : {},
-          attributes: { exclude: ['userId', 'contestId'] },
-          include: [
-            {
-              model: db.User,
-              required: true,
-              attributes: {
-                exclude: [
-                  'password',
-                  'role',
-                  'balance',
-                  'accessToken',
-                ],
+        ],
+      });
+      contestInfo = contestInfo.get({ plain: true });
+      contestInfo.Offers.forEach(offer => {
+        if (offer.Rating) {
+          offer.mark = offer.Rating.mark;
+        }
+        delete offer.Rating;
+      });
+      res.send(contestInfo);
+    } else if(findoffer && findRating === null){
+      let contestInfo = await db.Contest.findOne({
+        where: { id: req.headers.contestid },
+        order: [
+          [db.Offer, 'id', 'asc'],
+        ],
+        include: [
+          {
+            model: db.User,
+            required: true,
+            attributes: {
+              exclude: [
+                'password',
+                'role',
+                'balance',
+                'accessToken',
+              ],
+            },
+          },
+          {
+            model: db.Offer,
+            required: false,
+            where: req.tokenData.role === CONSTANTS.CREATOR
+              ? { userId: req.tokenData.userId }
+              : {},
+            attributes: { exclude: ['userId', 'contestId'] },
+            include: [
+              {
+                model: db.User,
+                required: true,
+                attributes: {
+                  exclude: [
+                    'password',
+                    'role',
+                    'balance',
+                    'accessToken',
+                  ],
+                },
               },
+            ],
+          },
+        ],
+      });
+      res.send(contestInfo);
+    }else {
+      let contestInfo = await db.Contest.findOne({
+        where: { id: req.headers.contestid },
+        include: [
+          {
+            model: db.User,
+            required: true,
+            attributes: {
+              exclude: [
+                'password',
+                'role',
+                'balance',
+                'accessToken',
+              ],
             },
-            {
-              model: db.Rating,
-              required: false,
-              where: { userId: req.tokenData.userId },
-              attributes: { exclude: ['userId', 'offerId'] },
-            },
-          ],
-        },
-      ],
-    });
-    contestInfo = contestInfo.get({ plain: true });
-    contestInfo.Offers.forEach(offer => {
-      if (offer.Rating) {
-        offer.mark = offer.Rating.mark;
-      }
-      delete offer.Rating;
-    });
-    res.send(contestInfo);
+          }] });
+      res.send(contestInfo);
+    }
   } catch (e) {
     next(new ServerError());
-  }
-};
+  }};
+
 
 module.exports.downloadFile = async (req, res, next) => {
   const file = CONSTANTS.CONTESTS_DEFAULT_DIR + req.params.fileName;
@@ -177,19 +245,11 @@ const resolveOffer = async (
     contestId,
   }, transaction);
   transaction.commit();
-  const arrayRoomsId = [];
-  updatedOffers.forEach(offer => {
-    if (offer.status === CONSTANTS.OFFER_STATUS_REJECTED && creatorId !==
-      offer.userId) {
-      arrayRoomsId.push(offer.userId);
-    }
-  });
-  controller.getNotificationController().emitChangeOfferStatus(arrayRoomsId,
-    'Someone of yours offers was rejected', contestId);
   controller.getNotificationController().emitChangeOfferStatus(creatorId,
     'Someone of your offers WIN', contestId);
   return updatedOffers[ 0 ].dataValues;
 };
+
 
 module.exports.setOfferStatus = async (req, res, next) => {
   let transaction;

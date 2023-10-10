@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
@@ -19,8 +19,7 @@ import CONSTANTS from './constants';
 import browserHistory from './browserHistory';
 import ChatContainer from './components/Chat/ChatComponents/ChatContainer/ChatContainer';
 
-class App extends Component {
-  render() {
+export default function App() {
     return (
       <Router history={browserHistory}>
         <ToastContainer
@@ -73,6 +72,4 @@ class App extends Component {
       </Router>
     );
   }
-}
 
-export default App;

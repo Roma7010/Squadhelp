@@ -24,6 +24,7 @@ const OfferForm = (props) => {
       );
     }
     return (
+      <div>
       <FormInput
         name="offerData"
         classes={{
@@ -35,6 +36,7 @@ const OfferForm = (props) => {
         type="text"
         label="your suggestion"
       />
+    </div>
     );
   };
 
@@ -55,8 +57,8 @@ const OfferForm = (props) => {
   return (
     <div className={styles.offerContainer}>
       {addOfferError
-            && <Error data={addOfferError.data} status={addOfferError.status} clearError={clearOfferError} />}
-      <Formik
+            && <Error data={addOfferError.data} status={addOfferError.status} clearError={clearOfferError} />}          
+      {<Formik
         onSubmit={setOffer}
         initialValues={{
           offerData: '',
@@ -65,9 +67,9 @@ const OfferForm = (props) => {
       >
         <Form className={styles.form}>
           {renderOfferInput()}
-          {valid && <button type="submit" className={styles.btnOffer}>Send Offer</button>}
+          <button type="submit" className={styles.btnOffer}>Send Offer</button>
         </Form>
-      </Formik>
+      </Formik>}
     </div>
   );
 };

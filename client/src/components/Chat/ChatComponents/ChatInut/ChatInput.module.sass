@@ -16,24 +16,26 @@
     display: flex
     flex-direction: row
     justify-content: space-between
-    align-items: center
+    align-items: flex-start
 
     button
       position: relative
       padding: 0
+      width: 5px
+      left: -10px
       border: none
-      background-color: white
+      background-color:  #f9fafb
       outline: none
       cursor: pointer
 
     img
-      position: absolute
+      position: relative
       margin-left: 20px
       cursor: pointer
-      top: -15px
-      left: -8px
+      top: 0px
+      left: -10px
       transition: transform 0.2s ease
-      transform: rotate(150deg)
+      
 
       &:hover
         width: 35px
@@ -41,6 +43,7 @@
 
     .container
       display: flex
+      flex-direction: column
       padding: 0 15px
       justify-content: flex-start
       align-items: center

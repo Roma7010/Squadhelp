@@ -39,7 +39,9 @@ class ContestPage extends React.Component {
     };
 
     setOffersList = () => {
+      console.log("contestpageprops", this.props);
       const array = [];
+      if(this.props.contestByIdStore.offers){
       for (let i = 0; i < this.props.contestByIdStore.offers.length; i++) {
         array.push(<OfferBox
           data={this.props.contestByIdStore.offers[i]}
@@ -49,7 +51,8 @@ class ContestPage extends React.Component {
           contestType={this.props.contestByIdStore.contestData.contestType}
           date={new Date()}
         />);
-      }
+      }}
+      console.log('arraysetofferslist',array.length);
       return array.length !== 0 ? array : <div className={styles.notFound}>There is no suggestion at this moment</div>;
     };
 
@@ -119,9 +122,9 @@ class ContestPage extends React.Component {
         offers,
         setOfferStatusError,
       } = contestByIdStore;
+      console.log('offers',offers);
       return (
         <div>
-          {/* <Chat/> */}
           {isShowOnFull && (
           <LightBox
             mainSrc={`${CONSTANTS.publicURL}${imagePath}`}
@@ -175,7 +178,7 @@ Offer
                                               />
                                               )}
                                               <div className={styles.offers}>
-                                                {this.setOffersList()}
+                                                {this.setOffersList()}  
                                               </div>
                                             </div>
                                           )
@@ -183,7 +186,7 @@ Offer
                     </div>
                     <ContestSideBar
                       contestData={contestData}
-                      totalEntries={offers.length}
+                     totalEntries={offers ? offers.length : "0"}
                     />
                   </div>
                 )

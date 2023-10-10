@@ -138,6 +138,21 @@ class ContestForm extends React.Component {
                     }}
                   />
                 </div>
+                <div className={styles.inputContainer}>
+            <span className={styles.inputHeader}>
+              What name of your venture?
+            </span>
+            <FormInput
+              name="nameVenture"
+              type="text"
+              label="name of venture"
+              classes={{
+                container: styles.componentInputContainer,
+                input: styles.input,
+                warning: styles.warning,
+              }}
+            />
+          </div>
                 <OptionalSelects {...this.props} />
                 <FieldFileInput
                   name="file"

@@ -18,6 +18,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import './confirmStyle.css';
 
 const OfferBox = (props) => {
+  console.log('OfferBoxprops',props);
   const findConversationInfo = () => {
     const { messagesPreview, id } = props;
     const participants = [id, props.data.User.id];
